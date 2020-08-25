@@ -62,16 +62,28 @@ foreach(testName IN LISTS ALL_LOG4CXX_TESTS)
     if(WIN32)
         get_filename_component(APR_DLL_DIR "${APR_DLL}" DIRECTORY)
         get_filename_component(APR_UTIL_DLL_DIR "${APR_UTIL_DLL}" DIRECTORY)
+        get_filename_component(LOG4CXX_DLL_DIR "${CMAKE_INSTALL_PREFIX}\\bin" DIRECTORY)
         get_filename_component(XMLLIB_DLL_DIR "${XMLLIB_DLL}" DIRECTORY)
-        set(PATH_FOR_TESTS $<SHELL_PATH:$<TARGET_FILE_DIR:log4cxx>> ${APR_DLL_DIR} ${APR_UTIL_DLL_DIR} ${XMLLIB_DLL_DIR})
+
+        set(PATH_FOR_TESTS ${APR_DLL_DIR}\\$<SEMICOLON>${APR_UTIL_DLL_DIR}\\$<SEMICOLON>${LOG4CXX_DLL_DIR}\\$<SEMICOLON>C:\\Users\\tschoening\\Documents\\Svn\\Src\\Libs\\trunk\\C\\XML\\libexpat\\2.2.9\\src\\expat\\out\\install\\x64-Debug\\bin)
         list(REMOVE_DUPLICATES PATH_FOR_TESTS)
+message( "${PATH_FOR_TESTS}" )
         if(${testName} STREQUAL socketservertestcase)
             set_tests_properties(socketservertestcase PROPERTIES
-                ENVIRONMENT "SOCKET_SERVER_PARAMETER_FILE=${START_SOCKET_SERVER_PARAMETER_FILE};PATH=${LOG4CXX_DLL_DIR}\;${APR_DLL_DIR}\;${APR_UTIL_DLL_DIR}"
+                ENVIRONMENT "SOCKET_SERVER_PARAMETER_FILE=${START_SOCKET_SERVER_PARAMETER_FILE};PATH=${PATH_FOR_TESTS}"
             )
         else()
+           set_property(TEST ${testName} APPEND PROPERTY
+                ENVIRONMENT "PATH=${APR_DLL_DIR}"
+           )
+           set_property(TEST ${testName} APPEND PROPERTY
+                ENVIRONMENT "PATH=${APR_UTIL_DLL_DIR}"
+           )
+           set_property(TEST ${testName} APPEND PROPERTY
+                ENVIRONMENT "PATH=${LOG4CXX_DLL_DIR}"
+           )
            set_tests_properties(${testName} PROPERTIES
-                ENVIRONMENT "TOTO=wonderful;key1=value1;key2=value2;PATH==${LOG4CXX_DLL_DIR}\;${APR_DLL_DIR}\;${APR_UTIL_DLL_DIR}"
+                ENVIRONMENT "TOTO=wonderful;key1=value1;key2=value2"
            )
         endif()
     else()
